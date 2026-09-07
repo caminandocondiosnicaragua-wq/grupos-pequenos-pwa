@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 500">
+<defs>
+  <radialGradient id="g" cx="50%" cy="45%" r="62%">
+    <stop offset="0" stop-color="#fff1a6"/>
+    <stop offset=".62" stop-color="#e6c84f"/>
+    <stop offset="1" stop-color="#c99535"/>
+  </radialGradient>
+</defs>
+<circle cx="250" cy="250" r="236" fill="#f7ead0" stroke="#c98e4a" stroke-width="18"/>
+<circle cx="250" cy="250" r="213" fill="url(#g)" stroke="#a56f36" stroke-width="4"/>
+<text x="250" y="82" text-anchor="middle" font-family="Georgia,serif" font-size="48" font-weight="700" fill="#111" letter-spacing="3">ANTIOQUIA</text>
+<text x="250" y="448" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="700" fill="#111" letter-spacing="1">INSTITUTO TEOLÓGICO INTERDENOMINACIONAL</text>
+<text x="250" y="472" text-anchor="middle" font-family="Arial,sans-serif" font-size="22" font-weight="700" fill="#111">DE NICARAGUA · ITIN</text>
+<!-- central cross -->
+<path d="M224 158h52v65h66v48h-66v126h-52V271h-66v-48h66z" fill="#111"/>
+<!-- open book -->
+<path d="M125 320 Q180 300 232 328 L232 374 Q178 348 125 370Z" fill="#f3f3ef" stroke="#111" stroke-width="6"/>
+<path d="M375 320 Q320 300 268 328 L268 374 Q322 348 375 370Z" fill="#f3f3ef" stroke="#111" stroke-width="6"/>
+<!-- flame -->
+<path d="M250 142 C218 173 225 201 250 211 C275 199 282 173 250 142Z" fill="#ef7f32" stroke="#111" stroke-width="5"/>
+<path d="M250 166 C239 180 241 191 250 197 C259 191 261 180 250 166Z" fill="#8fd2df"/>
+</svg>
