@@ -1,4 +1,4 @@
-const CACHE='grupos-pequenos-v10-dinamica-1';
+const CACHE='grupos-pequenos-v10-dinamica-2';
 const ASSETS=[
   './',
   './index.html',
@@ -12,6 +12,28 @@ const ASSETS=[
   './assets/supervision.jpeg',
   './assets/evaluacion.jpeg'
 ];
+const DYNAMIC_STYLE=`
+body{overflow-x:hidden;background-image:radial-gradient(circle at 12% 18%,rgba(214,166,74,.10),transparent 24%),radial-gradient(circle at 88% 78%,rgba(200,111,74,.08),transparent 26%)}
+body::before,body::after{content:"";position:fixed;z-index:-1;pointer-events:none;border-radius:50%;filter:blur(2px);opacity:.34}
+body::before{width:42vw;height:42vw;right:-18vw;top:8vh;background:radial-gradient(circle,rgba(214,166,74,.20),transparent 68%);animation:ambientFloat 12s ease-in-out infinite}
+body::after{width:38vw;height:38vw;left:-18vw;bottom:4vh;background:radial-gradient(circle,rgba(200,111,74,.13),transparent 68%);animation:ambientFloat 15s ease-in-out infinite reverse}
+.wrap{position:relative}.wrap::before{content:"";position:absolute;left:50%;top:0;width:1px;height:100%;background:linear-gradient(transparent,rgba(214,166,74,.14) 20%,rgba(214,166,74,.14) 80%,transparent);pointer-events:none}
+.cover>img{height:520px;animation:imageBreath 7s ease-in-out infinite alternate}.cover>img:hover,.hero img:hover,.band img:hover{animation-play-state:paused}
+.flow .node{position:relative;overflow:hidden}.flow .node::after{content:"";position:absolute;inset:-30% -80%;background:linear-gradient(110deg,transparent 42%,rgba(214,166,74,.18) 50%,transparent 58%);transform:translateX(-60%) rotate(8deg);animation:nodeShimmer 4.8s ease-in-out infinite;pointer-events:none}
+.nav button.active{box-shadow:inset 3px 0 var(--gold)}
+@keyframes ambientFloat{0%,100%{transform:translate3d(0,0,0) scale(1)}50%{transform:translate3d(0,-18px,0) scale(1.06)}}
+@keyframes imageBreath{0%{transform:scale(1)}100%{transform:scale(1.018)}}
+@keyframes nodeShimmer{0%,55%,100%{transform:translateX(-65%) rotate(8deg)}75%{transform:translateX(65%) rotate(8deg)}}
+@media(max-width:900px){.cover>img{height:390px}.wrap::before{display:none}}@media(max-width:600px){.cover>img{height:290px}}
+@media(prefers-reduced-motion:reduce){body::before,body::after,.cover>img,.flow .node::after{animation:none!important}}
+`;
+async function addDynamicStyle(response){
+  const html=await response.text();
+  if(!html.includes('</style>')) return response;
+  const headers=new Headers(response.headers);
+  headers.set('Content-Type','text/html; charset=utf-8');
+  return new Response(html.replace('</style>',DYNAMIC_STYLE+'</style>'),{status:response.status,statusText:response.statusText,headers});
+}
 self.addEventListener('install',event=>event.waitUntil(
   caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())
 ));
@@ -20,11 +42,15 @@ self.addEventListener('activate',event=>event.waitUntil(
 ));
 self.addEventListener('fetch',event=>{
   if(event.request.method!=='GET') return;
+  const isDocument=event.request.destination==='document' || event.request.url.endsWith('/index.html') || event.request.url.endsWith('/');
   event.respondWith(
-    caches.match(event.request).then(cached=>cached||fetch(event.request).then(response=>{
-      const copy=response.clone();
-      caches.open(CACHE).then(cache=>cache.put(event.request,copy));
-      return response;
-    }).catch(()=>caches.match('./index.html')))
+    caches.match(event.request).then(cached=>{
+      if(cached) return isDocument ? addDynamicStyle(cached) : cached;
+      return fetch(event.request).then(response=>{
+        const copy=response.clone();
+        caches.open(CACHE).then(cache=>cache.put(event.request,copy));
+        return isDocument ? addDynamicStyle(response) : response;
+      }).catch(()=>caches.match('./index.html').then(fallback=>isDocument?addDynamicStyle(fallback):fallback));
+    })
   );
 });
